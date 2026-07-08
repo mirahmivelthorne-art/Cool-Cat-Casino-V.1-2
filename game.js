@@ -70,9 +70,11 @@ function renderMachineBank(){const bank=document.getElementById("slot-bank");if(
  const rows=Math.max(1,Math.ceil(slots.length/4));document.querySelector(".slot-room").style.height=`${Math.max(385,105+rows*191)}px`;
  bank.querySelectorAll("[data-action]").forEach(element=>element.addEventListener("click",event=>{event.stopPropagation();runAction(element.dataset.action);}));
  rebuildMachineTargets();
+ renderFloorPlanArchitecture();
 }
 function rebuildMachineTargets(){if(typeof actionTargets==="undefined")return;for(let i=actionTargets.length-1;i>=0;i--)if(actionTargets[i].machine)actionTargets.splice(i,1);machineSpaces.forEach(space=>{const slot=space.slot;actionTargets.push({x:space.targetX,y:space.targetY,action:slot.action,machine:true,label:slot.empty?`Buy a slot machine (${machineCost()} coins)`:slot.broken?"Inspect Lucky Number Three":`Play ${slot.name}`});});}
 function machineCollisionRects(){return machineSpaces.map(space=>({x:space.x,y:space.y,w:space.w,h:space.h}));}
+const FLOOR_ORIGIN={x:60,y:110};
 function roomWallRects(){const t=14,slotRows=Math.max(1,Math.ceil(machineSlots().length/4)),slotHeight=Math.max(385,105+slotRows*191);return [
  {x:60,y:110,w:1680,h:72},{x:60,y:1145,w:690,h:45},{x:1020,y:1145,w:720,h:45},{x:60,y:110,w:40,h:1080},{x:1700,y:110,w:40,h:1080},
  {x:135,y:230,w:565,h:t},{x:135,y:230,w:t,h:slotHeight},{x:686,y:230,w:t,h:slotHeight},{x:135,y:230+slotHeight-t,w:170,h:t},{x:520,y:230+slotHeight-t,w:172,h:t},
@@ -90,7 +92,9 @@ const furnitureRects=[
  {x:710,y:940,w:250,h:95},{x:725,y:1035,w:260,h:45},
  {x:1120,y:720,w:90,h:95},{x:1515,y:715,w:90,h:95},{x:1165,y:955,w:120,h:120},{x:1315,y:880,w:270,h:205}
 ];
-function collides(x,y){const r=22;return roomWallRects().concat(furnitureRects,machineCollisionRects()).some(rect=>x+r>rect.x&&x-r<rect.x+rect.w&&y+r>rect.y&&y-r<rect.y+rect.h);}
+function solidFurnitureRects(){return furnitureRects.concat(machineCollisionRects());}
+function renderFloorPlanArchitecture(){const layer=document.getElementById("floor-plan-layer");if(!layer)return;layer.innerHTML=roomWallRects().map(rect=>{const vertical=rect.h>rect.w,localX=rect.x-FLOOR_ORIGIN.x,localY=rect.y-FLOOR_ORIGIN.y;return `<i class="floor-wall ${vertical?"vertical":"horizontal"}" style="left:${localX}px;top:${localY}px;width:${rect.w}px;height:${rect.h}px"></i>`;}).join("");}
+function collides(x,y){const r=22;return roomWallRects().concat(solidFurnitureRects()).some(rect=>x+r>rect.x&&x-r<rect.x+rect.w&&y+r>rect.y&&y-r<rect.y+rect.h);}
 if(collides(playerPosition.x,playerPosition.y)){playerPosition.x=830;playerPosition.y=760;}
 function movePlayer(dx,dy,dt){if(!dx&&!dy){player.classList.remove("walking");return;}const mag=Math.hypot(dx,dy)||1,step=180*dt;dx=dx/mag*step;dy=dy/mag*step;const nx=Math.max(90,Math.min(WORLD.width-90,playerPosition.x+dx));const ny=Math.max(160,Math.min(WORLD.height-70,playerPosition.y+dy));if(!collides(nx,playerPosition.y))playerPosition.x=nx;if(!collides(playerPosition.x,ny))playerPosition.y=ny;player.classList.add("walking");player.style.left=`${playerPosition.x}px`;player.style.top=`${playerPosition.y}px`;}
 function updateCamera(){const vw=viewport.clientWidth,vh=viewport.clientHeight;const x=Math.min(0,Math.max(vw-WORLD.width,vw/2-playerPosition.x));const y=Math.min(0,Math.max(vh-WORLD.height,vh/2-playerPosition.y));world.style.transform=`translate3d(${Math.round(x)}px,${Math.round(y)}px,0)`;}
