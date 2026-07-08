@@ -79,32 +79,34 @@ function isPublicWalkable(type){return type===TILE.floor||type===TILE.door;}
 function canUseTile(type,opts={}){return isPublicWalkable(type)||(type===TILE.staff&&opts.allowStaff);}
 function canRouteTile(type,opts={}){return type===TILE.floor||type===TILE.door||(type===TILE.staff&&opts.allowStaff);}
 function canOccupyTile(c,r,opts={}){return canUseTile(tileType(c,r),opts);}
+function outlineRoom(c,r,w,h){fillTiles(c,r,w,1,TILE.wall);fillTiles(c,r+h-1,w,1,TILE.wall);fillTiles(c,r,1,h,TILE.wall);fillTiles(c+w-1,r,1,h,TILE.wall);}
 function buildGridLayout(){
  tileMap.clear();
  fillTiles(0,0,GRID.cols,1,TILE.wall);fillTiles(0,GRID.rows-1,GRID.cols,1,TILE.wall);fillTiles(0,0,1,GRID.rows,TILE.wall);fillTiles(GRID.cols-1,0,1,GRID.rows,TILE.wall);
  fillTiles(1,1,GRID.cols-2,GRID.rows-2,TILE.floor);
- [[7,9,1,10],[25,5,1,17],[34,15,1,6],[26,14,13,1],[2,19,24,1],[15,21,1,4]].forEach(rect=>fillTiles(...rect,TILE.wall));
- fillTiles(17,21,9,4,TILE.staff);
- [[0,13,1,3],[1,13,1,3],[7,12,1,3],[25,9,1,4],[25,16,1,4],[34,17,1,2],[9,19,3,1],[19,20,3,1],[15,20,2,1]].forEach(rect=>fillTiles(...rect,TILE.door));
- fillTiles(0,13,1,3,TILE.door);
- [[4,11,1,4],[2,13,1,2],[3,16,1,2],[24,20,1,1],[38,12,1,1]].forEach(rect=>fillTiles(...rect,TILE.counter));
+ [[1,9,8,10],[2,20,13,5],[17,21,9,4],[35,15,4,6]].forEach(rect=>outlineRoom(...rect));
+ fillTiles(8,1,1,8,TILE.wall);
+ fillTiles(2,10,6,4,TILE.staff);fillTiles(18,22,7,2,TILE.staff);
+ [[0,13,2,3],[1,12,1,1],[8,15,1,2],[9,20,3,1],[19,21,3,1],[35,17,1,2]].forEach(rect=>fillTiles(...rect,TILE.door));
+ [[2,14,5,1],[2,16,1,2],[7,16,1,2],[24,20,1,1],[38,12,1,1]].forEach(rect=>fillTiles(...rect,TILE.counter));
  [[28,7,3,2],[35,7,3,2],[31,11,4,1]].forEach(rect=>fillTiles(...rect,TILE.furniture));
  [[27,17,4,1],[27,19,4,1]].forEach(rect=>fillTiles(...rect,TILE.counter));
- [[36,17,1,2],[4,22,1,1],[11,22,2,1],[7,22,2,1],[18,22,3,1],[22,23,2,1],[6,18,1,1],[23,5,1,2],[38,20,1,1]].forEach(rect=>fillTiles(...rect,TILE.furniture));
+ [[36,17,1,2],[4,22,1,1],[11,22,2,1],[7,22,2,1],[18,22,3,1],[22,23,2,1],[3,11,2,1],[6,11,1,2],[23,5,1,2],[38,20,1,1]].forEach(rect=>fillTiles(...rect,TILE.furniture));
  machineSpaces.forEach(space=>{const c=Math.floor((space.x-GRID.x)/GRID.t),r=Math.floor((space.y-GRID.y)/GRID.t);fillTiles(c,r,Math.ceil(space.w/GRID.t),Math.ceil(space.h/GRID.t),TILE.machine);});
 }
 function positionGridElement(selector,c,r,w,h){const el=document.querySelector(selector);if(!el)return;const rect=tileRect(c,r,w,h);Object.assign(el.style,{left:`${rect.x-60}px`,top:`${rect.y-110}px`,right:"auto",bottom:"auto",width:`${rect.w}px`,height:`${rect.h}px`});}
 function positionGridObject(selector,c,r,w,h){const el=document.querySelector(selector);if(!el)return;const rect=tileRect(c,r,w,h),parent=el.parentElement,room=parent?.classList?.contains("room");const baseX=room?60+(parseFloat(parent.style.left)||0):60,baseY=room?110+(parseFloat(parent.style.top)||0):110;Object.assign(el.style,{left:`${rect.x-baseX}px`,top:`${rect.y-baseY}px`,right:"auto",bottom:"auto",width:`${rect.w}px`,height:`${rect.h}px`});}
 function applyGridLayout(){
- positionGridElement(".cashier-room",2,9,5,10);positionGridElement(".slot-room",8,5,17,17);positionGridElement(".table-room",26,5,13,9);positionGridElement(".bar-room",26,15,8,8);
+ positionGridElement(".cashier-room",1,9,8,10);positionGridElement(".slot-room",9,3,17,16);positionGridElement(".table-room",27,4,12,10);positionGridElement(".bar-room",27,15,11,7);
  positionGridElement(".restroom-room",35,15,4,6);positionGridElement(".lounge-room",2,20,13,5);positionGridElement(".maintenance-room",17,21,9,4);
- positionGridObject(".cashier-desk",4,11,1,4);positionGridObject(".catm-one",2,13,1,2);positionGridObject(".catm-two",3,16,1,2);positionGridObject(".catm-three",24,20,1,1);positionGridObject(".catm-four",38,12,1,1);
+ positionGridObject(".cashier-desk",2,14,5,1);positionGridObject(".catm-one",2,16,1,2);positionGridObject(".catm-two",7,16,1,2);positionGridObject(".catm-three",24,20,1,1);positionGridObject(".catm-four",38,12,1,1);
  positionGridObject(".blackjack-table",28,7,3,2);positionGridObject(".roulette-table",35,7,3,2);positionGridObject(".craps-reserve",31,11,4,1);
  positionGridObject(".bar-counter",27,17,4,1);positionGridObject(".bar-stools",27,19,4,1);positionGridObject(".restroom-door",36,17,1,2);
  positionGridObject(".chair-a",4,22,1,1);positionGridObject(".chair-b",11,22,2,1);positionGridObject(".coffee-table",7,22,2,1);positionGridObject(".shelves",18,22,3,1);positionGridObject(".workbench",22,23,2,1);
+ positionGridObject(".break-label",3,11,2,1);positionGridObject(".vault-label",6,11,1,2);
  positionGridObject(".p1",6,18,1,1);positionGridObject(".statue",23,5,1,2);positionGridObject(".p2",38,20,1,1);
- positionGridObject(".door-slots",0,13,2,1);positionGridObject(".door-games",25,9,1,2);positionGridObject(".door-blackjack",7,12,1,3);positionGridObject(".door-roulette",25,16,1,2);
- positionGridObject(".door-cashier",3,8,3,1);positionGridObject(".door-tea",28,14,3,1);positionGridObject(".door-lounge",9,19,3,1);positionGridObject(".door-workshop",19,20,3,1);positionGridObject(".door-restroom",34,17,1,2);
+ positionGridObject(".door-slots",0,13,2,1);positionGridObject(".door-games",28,4,4,1);positionGridObject(".door-blackjack",13,3,5,1);positionGridObject(".door-roulette",29,14,4,1);
+ positionGridObject(".door-cashier",8,15,1,2);positionGridObject(".door-staff",1,12,1,1);positionGridObject(".door-tea",28,14,3,1);positionGridObject(".door-lounge",9,20,3,1);positionGridObject(".door-workshop",19,21,3,1);positionGridObject(".door-restroom",35,17,1,2);
 }
 function machineLabel(index){return machineNames[(index-2)%machineNames.length]||`MACHINE ${index+1}`;}
 function machineSymbols(index){const sets=[["7","$","7"],["F","7","P"],["T","*","7"],["$","$","7"],["C","7","C"],["W","7","$"]];return sets[index%sets.length];}
@@ -116,7 +118,7 @@ function machineSlots(){const slots=[];let owned=0;if(state.machines>0){slots.pu
  while(slots.length<10)slots.push({empty:true,name:"EMPTY HOOKUP",action:"buyMachine"});
  return slots.slice(0,10);
 }
-function renderMachineBank(){const bank=document.getElementById("slot-bank");if(!bank)return;const slots=machineSlots();machineSpaces.length=0;bank.innerHTML=slots.map((slot,index)=>{const space=machineSpace(index);machineSpaces.push({...space,slot});const roomOrigin=tileRect(8,5),localX=space.x-roomOrigin.x,localY=space.y-roomOrigin.y;if(slot.empty)return `<button class="machine locked empty" style="left:${localX}px;top:${localY}px" data-machine-index="${index}" data-action="buy-machine"><span>+</span><b>${slot.name}</b><small>${machineCost()} COINS</small></button>`;const needsService=state.serviceNeeded&&slot.owned&&!slot.story&&index===0;const cls=`machine ${slot.old?"old ":""}${slot.broken||needsService?"broken service ":""}`;const action=slot.broken?"repair":"slots";const sign=slot.broken?'<i class="breakdown-sign">&#128295;<em>OUT OF ORDER</em></i>':"";return `<button class="${cls.trim()}" style="left:${localX}px;top:${localY}px" data-machine-index="${index}" data-action="${action}" title="${slot.story?"Lucky Number Three":slot.name}">${sign}<span>${slot.symbols[0]}</span><span>${slot.symbols[1]}</span><span>${slot.symbols[2]}</span><b>${slot.name}</b></button>`;}).join("");
+function renderMachineBank(){const bank=document.getElementById("slot-bank");if(!bank)return;const slots=machineSlots();machineSpaces.length=0;bank.innerHTML=slots.map((slot,index)=>{const space=machineSpace(index);machineSpaces.push({...space,slot});const roomOrigin=tileRect(9,3),localX=space.x-roomOrigin.x,localY=space.y-roomOrigin.y;if(slot.empty)return `<button class="machine locked empty" style="left:${localX}px;top:${localY}px" data-machine-index="${index}" data-action="buy-machine"><span>+</span><b>${slot.name}</b><small>${machineCost()} COINS</small></button>`;const needsService=state.serviceNeeded&&slot.owned&&!slot.story&&index===0;const cls=`machine ${slot.old?"old ":""}${slot.broken||needsService?"broken service ":""}`;const action=slot.broken?"repair":"slots";const sign=slot.broken?'<i class="breakdown-sign">&#128295;<em>OUT OF ORDER</em></i>':"";return `<button class="${cls.trim()}" style="left:${localX}px;top:${localY}px" data-machine-index="${index}" data-action="${action}" title="${slot.story?"Lucky Number Three":slot.name}">${sign}<span>${slot.symbols[0]}</span><span>${slot.symbols[1]}</span><span>${slot.symbols[2]}</span><b>${slot.name}</b></button>`;}).join("");
  bank.querySelectorAll("[data-action]").forEach(element=>element.addEventListener("click",event=>{event.stopPropagation();runAction(element.dataset.action);}));
  applyGridLayout();
  buildGridLayout();
@@ -129,10 +131,10 @@ function spotTarget(c,r,action,label,extra={}){const point=tileCenter(c,r);retur
 function staticInteractionTargets(){return [
  spotTarget(28,10,"blackjack","Play Blackjack"),spotTarget(29,10,"blackjack","Play Blackjack"),spotTarget(30,10,"blackjack","Play Blackjack"),
  spotTarget(35,10,"roulette","Play Roulette"),spotTarget(36,10,"roulette","Play Roulette"),spotTarget(37,10,"roulette","Play Roulette"),spotTarget(38,10,"roulette","Play Roulette"),
- spotTarget(3,13,"catm","Use CATM"),spotTarget(4,16,"catm","Use CATM"),spotTarget(23,20,"catm","Use CATM"),spotTarget(37,12,"catm","Use CATM"),
- spotTarget(5,11,"cashier","Visit Cashier"),spotTarget(5,12,"cashier","Visit Cashier"),spotTarget(5,13,"cashier","Visit Cashier"),spotTarget(5,14,"cashier","Visit Cashier"),
+ spotTarget(3,16,"catm","Use CATM"),spotTarget(6,16,"catm","Use CATM"),spotTarget(23,20,"catm","Use CATM"),spotTarget(37,12,"catm","Use CATM"),
+ spotTarget(2,15,"cashier","Visit Cashier"),spotTarget(3,15,"cashier","Visit Cashier"),spotTarget(4,15,"cashier","Visit Cashier"),spotTarget(5,15,"cashier","Visit Cashier"),spotTarget(6,15,"cashier","Visit Cashier"),
  spotTarget(27,18,"tea","Order Catnip Tea"),spotTarget(28,18,"tea","Order Catnip Tea"),spotTarget(29,18,"tea","Order Catnip Tea"),spotTarget(30,18,"tea","Order Catnip Tea"),
- spotTarget(35,18,"restroom","Clean Powder Paw Room"),spotTarget(37,19,"restroom","Clean Powder Paw Room"),spotTarget(38,18,"restroom","Clean Powder Paw Room")
+ spotTarget(35,18,"restroom","Clean Powder Paw Room"),spotTarget(37,18,"restroom","Clean Powder Paw Room"),spotTarget(37,19,"restroom","Clean Powder Paw Room")
 ];}
 function passiveInteractionSpots(){return [{c:31,r:12,label:"Future craps spot"},{c:32,r:12,label:"Future craps spot"},{c:33,r:12,label:"Future craps spot"},{c:21,r:22,label:"Workshop shelves",staff:true},{c:21,r:23,label:"Benny's workbench",staff:true},{c:22,r:22,label:"Benny's workbench",staff:true}];}
 function machineInteractionTargets(){return machineSpaces.map((space,index)=>{const slot=space.slot,action=slot.empty?"buy-machine":slot.action,label=slot.empty?`Buy a slot machine (${machineCost()} coins)`:slot.broken?"Inspect Lucky Number Three":`Play ${slot.name}`;return spotTarget(space.spot.c,space.spot.r,action,label,{machine:true,machineIndex:index,machineName:slot.name,empty:slot.empty});});}
@@ -160,12 +162,12 @@ function normalizePlayerPosition(){buildGridLayout();const current=feetTile(play
 
 const activitySpots={entry:tileCenter(0,14),workshopWait:tileCenter(19,20)};
 const destinationPools={
- catm:[tileCenter(3,13),tileCenter(4,16),tileCenter(23,20),tileCenter(37,12)],
- cashier:[tileCenter(5,11),tileCenter(5,12),tileCenter(5,13),tileCenter(5,14)],
+ catm:[tileCenter(3,16),tileCenter(6,16),tileCenter(23,20),tileCenter(37,12)],
+ cashier:[tileCenter(2,15),tileCenter(3,15),tileCenter(4,15),tileCenter(5,15),tileCenter(6,15)],
  slots:[tileCenter(11,11),tileCenter(14,11),tileCenter(17,11),tileCenter(20,11),tileCenter(23,11),tileCenter(11,18),tileCenter(14,18),tileCenter(17,18),tileCenter(20,18),tileCenter(23,18)],
  tables:[tileCenter(28,10),tileCenter(29,10),tileCenter(30,10),tileCenter(35,10),tileCenter(36,10),tileCenter(37,10),tileCenter(38,10)],
  tea:[tileCenter(27,18),tileCenter(28,18),tileCenter(29,18),tileCenter(30,18)],
- restroom:[tileCenter(35,18),tileCenter(37,19),tileCenter(38,18)],
+ restroom:[tileCenter(35,18),tileCenter(37,18),tileCenter(37,19)],
  lounge:[tileCenter(3,21),tileCenter(6,24),tileCenter(10,21),tileCenter(13,24)],
  leaving:[tileCenter(0,14)]
 };
