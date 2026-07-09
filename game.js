@@ -51,15 +51,14 @@ function startMusic(){
  for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*(1-i/data.length);
  const note=(freq,t,dur,type,gain)=>{const o=audioContext.createOscillator(),g=audioContext.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(gain*state.music/100,t+.025);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g).connect(audioContext.destination);o.start(t);o.stop(t+dur+.04);};
  const brush=(t,gain=.018)=>{const s=audioContext.createBufferSource(),g=audioContext.createGain(),f=audioContext.createBiquadFilter();s.buffer=noise;f.type="highpass";f.frequency.value=1600;g.gain.setValueAtTime(gain*state.music/100,t);g.gain.exponentialRampToValueAtTime(.0001,t+.055);s.connect(f).connect(g).connect(audioContext.destination);s.start(t);};
- const trombone=(from,to,t,dur=.28,gain=.018)=>{const o=audioContext.createOscillator(),o2=audioContext.createOscillator(),g=audioContext.createGain(),f=audioContext.createBiquadFilter();o.type="sawtooth";o2.type="triangle";o.frequency.setValueAtTime(from,t);o.frequency.exponentialRampToValueAtTime(to,t+Math.min(.18,dur*.55));o2.frequency.setValueAtTime(from*.997,t);o2.frequency.exponentialRampToValueAtTime(to*.997,t+Math.min(.18,dur*.55));f.type="lowpass";f.frequency.setValueAtTime(760,t);f.frequency.linearRampToValueAtTime(1180,t+.06);f.frequency.linearRampToValueAtTime(690,t+dur);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(gain*state.music/100,t+.045);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(f);o2.connect(f);f.connect(g).connect(audioContext.destination);o.start(t);o2.start(t);o.stop(t+dur+.05);o2.stop(t+dur+.05);};
- const phrases=[
-  [{d:0,a:392,b:440,l:.25},{d:.45,a:440,b:493.88,l:.22},{d:.82,a:523.25,b:493.88,l:.32}],
-  [{d:0,a:329.63,b:392,l:.3},{d:.52,a:392,b:369.99,l:.2},{d:.86,a:349.23,b:392,l:.28}],
-  [{d:0,a:440,b:493.88,l:.24},{d:.36,a:493.88,b:587.33,l:.34},{d:.9,a:523.25,b:493.88,l:.24}],
-  [{d:0,a:293.66,b:329.63,l:.28},{d:.48,a:349.23,b:392,l:.28},{d:.9,a:440,b:392,l:.34}]
+ const hooks=[
+  [{d:0,f:659.25,l:.1},{d:.42,f:783.99,l:.12},{d:.82,f:739.99,l:.16}],
+  [{d:0,f:587.33,l:.1},{d:.34,f:659.25,l:.1},{d:.76,f:880,l:.14}],
+  [{d:0,f:783.99,l:.12},{d:.46,f:987.77,l:.1},{d:.88,f:880,l:.18}],
+  [{d:0,f:523.25,l:.1},{d:.38,f:659.25,l:.12},{d:.84,f:783.99,l:.16}]
  ];
- const playPhrase=(t,bar)=>phrases[bar%phrases.length].forEach(p=>trombone(p.a,p.b,t+p.d,p.l));
- const playStep=(t,n)=>{const eighth=n%16,quarter=n%2===0,bar=Math.floor(n/16)%chords.length;if(quarter)note(bass[(n/2)%bass.length],t,.28,"sine",.055);if([3,7,11,15].includes(eighth)){chords[bar].forEach((freq,i)=>note(freq*(i===3?2:1),t+i*.012,.22,"triangle",.012));note(chords[bar][2]*2,t+.02,.32,"sine",.01);}if(eighth%2===1)brush(t,.01);if(eighth===4||eighth===12){note(880,t,.045,"square",.006);brush(t,.022);}if(eighth===0&&bar%2===0)playPhrase(t+.08,bar);};
+ const playHook=(t,bar)=>hooks[bar%hooks.length].forEach(h=>{note(h.f,t+h.d,h.l,"triangle",.012);note(h.f*2,t+h.d+.015,h.l*.75,"sine",.005);});
+ const playStep=(t,n)=>{const eighth=n%16,quarter=n%2===0,bar=Math.floor(n/16)%chords.length;if(quarter)note(bass[(n/2)%bass.length],t,.28,"sine",.055);if([3,7,11,15].includes(eighth)){chords[bar].forEach((freq,i)=>note(freq*(i===3?2:1),t+i*.012,.22,"triangle",.012));note(chords[bar][2]*2,t+.02,.32,"sine",.01);}if(eighth%2===1)brush(t,.01);if(eighth===4||eighth===12){note(880,t,.045,"square",.006);brush(t,.022);}if(eighth===0&&bar%2===0)playHook(t+.08,bar);};
  musicTimer=setInterval(()=>{if(!audioContext)return;const now=audioContext.currentTime;if(!state.music){next=now+.05;return;}if(!next||next<now)next=now+.04;while(next<now+.25){playStep(next,step);next+=step%2===0?beat*swing:beat*(1-swing);step++;}},50);
 }
 document.getElementById("sound-toggle").onclick=()=>{ensureAudio();state.music=state.music?0:20;document.getElementById("sound-toggle").textContent=state.music?"🔊":"🔇";saveState();};
