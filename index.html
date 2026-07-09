@@ -18,6 +18,7 @@
     .cafe-table{display:grid;place-items:center;color:#583541;background:#ead6a0;border:4px solid #7c523d;border-radius:50%;box-shadow:0 6px #2b172a;font:900 18px Arial,sans-serif}
     .restroom-fixture{display:grid;place-items:center;color:#eaf5ff;background:#516b82;border:4px solid #304253;border-radius:6px;box-shadow:0 6px #2b172a;font:900 .42rem Arial,sans-serif}
     .attendant-fixture{position:absolute!important;z-index:14;display:grid;place-items:center;margin:0!important;color:#f7e7b8;background:#3a2b43;border:3px solid #9c7c71;border-radius:6px;box-shadow:0 5px #2b172a;font:900 .38rem Arial,sans-serif;text-align:center}
+    .npc.repairing .emoji-sprite{animation:npcWalk .18s infinite alternate;filter:drop-shadow(0 0 10px #ffe66e)}
     .door-restroom-b{transform:rotate(90deg)}
     .door-restroom-b span{transform:rotate(-90deg)}
   </style>
@@ -150,7 +151,7 @@
   </main>
 
   <aside id="expansion-panel" class="side-panel">
-    <button class="panel-close" type="button">×</button><p class="chapter">Uncle's Blueprint</p><h2>Casino Expansion</h2><p>Build the old place into something legendary.</p><div id="expansion-list"></div>
+    <button class="panel-close" type="button">×</button><p class="chapter">Uncle's Blueprint</p><h2>Floor 1 Progress</h2><p>Finish the first floor before later blueprints unlock.</p><div id="expansion-list"></div>
   </aside>
 
   <dialog id="dialog"><button class="dialog-close" type="button">×</button><div id="dialog-body"></div></dialog>
